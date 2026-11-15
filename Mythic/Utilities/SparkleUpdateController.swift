@@ -43,7 +43,12 @@ final class SparkleUpdateController: NSObject, SPUUserDriver, ObservableObject {
             log.error("Sparkle failed to start: \(error.localizedDescription).")
         }
 
-        self.manageBackgroundTask(sparkleUpdateAction != .off)
+        // `manageBackgroundTask` is inferred as MainActor-isolated by Xcode 27.
+        // Passing its callback to a background DispatchQueue consequently traps
+        // before the callback body is entered. Keep Sparkle available for manual
+        // checks while automatic checks are disabled until that toolchain issue is
+        // resolved upstream.
+        // self.manageBackgroundTask(sparkleUpdateAction != .off)
     }
 
     private func manageBackgroundTask(_ enabled: Bool) {
